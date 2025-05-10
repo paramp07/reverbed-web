@@ -1,7 +1,9 @@
 import axios from 'axios';
 
-// Use environment variable if available, otherwise fallback to localhost
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+// Hardcoded API URL for immediate testing
+const API_BASE_URL = 'https://reverbed-python-api.onrender.com';
+// Uncomment the line below when environment variables are properly set up
+// const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
 
 export interface VideoProcessRequest {
   youtube_url: string;
@@ -48,13 +50,27 @@ export interface YouTubeSearchResponse {
 }
 
 export const processVideo = async (request: VideoProcessRequest): Promise<JobStatus> => {
-  const response = await axios.post(`${API_BASE_URL}/process`, request);
-  return response.data;
+  console.log(`Making API request to: ${API_BASE_URL}/process`);
+  try {
+    const response = await axios.post(`${API_BASE_URL}/process`, request);
+    console.log('API response:', response.data);
+    return response.data;
+  } catch (error) {
+    console.error('API error:', error);
+    throw error;
+  }
 };
 
 export const previewAudio = async (request: PreviewRequest): Promise<JobStatus> => {
-  const response = await axios.post(`${API_BASE_URL}/preview`, request);
-  return response.data;
+  console.log(`Making API request to: ${API_BASE_URL}/preview`);
+  try {
+    const response = await axios.post(`${API_BASE_URL}/preview`, request);
+    console.log('API response:', response.data);
+    return response.data;
+  } catch (error) {
+    console.error('API error:', error);
+    throw error;
+  }
 };
 
 export const getJobStatus = async (jobId: string): Promise<JobStatus> => {
