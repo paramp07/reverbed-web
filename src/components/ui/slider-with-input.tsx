@@ -20,9 +20,7 @@ interface SliderWithInputProps {
   maxValue?: number;
   initialValue?: number;
   defaultValue?: number;
-  step?: number;
-  tooltipContent?: (value: number) => ReactNode;
-  onChange?: (value: number) => void;
+  step?: number;  onChange?: (value: number) => void;
   className?: string;
 }
 
@@ -33,7 +31,6 @@ export function SliderWithInput({
   initialValue = 0.5,
   defaultValue = 0.5,
   step = 0.01,
-  tooltipContent,
   onChange,
   className,
 }: SliderWithInputProps) {
