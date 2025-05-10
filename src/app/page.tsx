@@ -358,8 +358,19 @@ export default function Home() {
 
   const onSubmit = async (data: VideoProcessRequest) => {
     try {
+      // Validate YouTube URL
+      if (!isValidYouTubeUrl(data.youtube_url)) {
+        toast.error("Please enter a valid YouTube URL (e.g., https://www.youtube.com/watch?v=dQw4w9WgXcQ)");
+        return;
+      }
+
       // Ensure loop_video is set correctly based on video_url
       if (data.video_url && data.video_url.trim() !== "") {
+        // Validate video URL if provided
+        if (!isValidYouTubeUrl(data.video_url)) {
+          toast.error("Please enter a valid YouTube URL for video processing");
+          return;
+        }
         data.loop_video = true;
       }
 
@@ -383,17 +394,42 @@ export default function Home() {
       const response = await processVideo(data);
       setJobId(response.job_id);
       toast.info("Processing started...");
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error processing video:", error);
-      toast.error("Failed to start processing");
+
+      // Check for specific error messages
+      if (error.response?.data?.detail) {
+        // If the backend returns a specific error message
+        toast.error(`Error: ${error.response.data.detail}`);
+      } else if (error.message?.includes("Network Error")) {
+        toast.error("Network error. Please check your connection and try again.");
+      } else if (error.message?.includes("400")) {
+        toast.error("YouTube error: The video might be unavailable or restricted. Try a different video.");
+      } else {
+        toast.error("Failed to start processing. Please try a different YouTube URL.");
+      }
+
       setIsProcessing(false);
     }
+  };
+
+  // Function to validate YouTube URL
+  const isValidYouTubeUrl = (url: string) => {
+    // Basic YouTube URL validation
+    const youtubeRegex = /^(https?:\/\/)?(www\.)?(youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/shorts\/)[a-zA-Z0-9_-]{11}(?:\S+)?$/;
+    return youtubeRegex.test(url);
   };
 
   const handlePreview = async () => {
     // Check if URL is provided
     if (!youtubeUrl) {
       toast.error("Please enter a YouTube URL first");
+      return;
+    }
+
+    // Validate YouTube URL
+    if (!isValidYouTubeUrl(youtubeUrl)) {
+      toast.error("Please enter a valid YouTube URL (e.g., https://www.youtube.com/watch?v=dQw4w9WgXcQ)");
       return;
     }
 
@@ -427,9 +463,21 @@ export default function Home() {
       const response = await previewAudio(formValues);
       setPreviewJobId(response.job_id);
       toast.info("Generating preview...");
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error generating preview:", error);
-      toast.error("Failed to generate preview");
+
+      // Check for specific error messages
+      if (error.response?.data?.detail) {
+        // If the backend returns a specific error message
+        toast.error(`Error: ${error.response.data.detail}`);
+      } else if (error.message?.includes("Network Error")) {
+        toast.error("Network error. Please check your connection and try again.");
+      } else if (error.message?.includes("400")) {
+        toast.error("YouTube error: The video might be unavailable or restricted. Try a different video.");
+      } else {
+        toast.error("Failed to generate preview. Please try a different YouTube URL.");
+      }
+
       setIsPreviewing(false);
     }
   };
