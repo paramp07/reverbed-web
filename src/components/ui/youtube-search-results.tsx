@@ -2,6 +2,7 @@
 
 import { useRef, useEffect, useState } from "react";
 import { YouTubeVideo } from "@/app/api/client";
+import Image from "next/image";
 
 interface YouTubeSearchResultsProps {
   isSearching: boolean;
@@ -130,17 +131,21 @@ export const YouTubeSearchResults = ({
             >
               <div className="flex items-start space-x-3">
                 <div className="flex-shrink-0 w-24 h-16 relative overflow-hidden rounded">
-                  <img
+                  <Image
                     src={video.thumbnail}
                     alt={video.title}
-                    className="object-cover w-full h-full"
+                    fill
+                    sizes="(max-width: 768px) 96px, 96px"
+                    className="object-cover"
                     onError={(e) => {
                       // Fallback to default YouTube thumbnail if the image fails to load
                       const target = e.target as HTMLImageElement;
                       console.log(
                         `Image error for ${video.id}, using fallback`
                       );
+                      // @ts-ignore - Next.js Image doesn't have src property but we need this for fallback
                       target.onerror = null; // Prevent infinite loop
+                      // @ts-ignore
                       target.src = `https://i.ytimg.com/vi/${video.id}/mqdefault.jpg`;
                     }}
                   />

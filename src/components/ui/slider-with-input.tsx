@@ -12,7 +12,6 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { RotateCcw } from "lucide-react";
-import { ReactNode } from "react";
 
 interface SliderWithInputProps {
   label: string;
