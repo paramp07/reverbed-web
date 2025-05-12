@@ -13,6 +13,7 @@ export interface VideoProcessRequest {
   start_time?: string;
   end_time?: string;
   loop_video?: boolean;
+  output_type?: string; // "audio", "video", or "full_video"
 }
 
 export interface PreviewRequest {

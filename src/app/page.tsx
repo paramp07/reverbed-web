@@ -356,12 +356,18 @@ export default function Home() {
     return () => clearInterval(interval);
   }, [previewJobId]);
 
+  // State for output type selection
+  const [outputType, setOutputType] = useState<string>("audio");
+
   const onSubmit = async (data: VideoProcessRequest) => {
     try {
       // Ensure loop_video is set correctly based on video_url
       if (data.video_url && data.video_url.trim() !== "") {
         data.loop_video = true;
       }
+
+      // Set the output type from state
+      data.output_type = outputType;
 
       // Enhanced logging for process button
       console.log("PROCESS BUTTON CLICKED");
@@ -376,7 +382,8 @@ export default function Home() {
       console.log("Video Settings:", {
         start_time: data.start_time,
         end_time: data.end_time,
-        loop_video: data.loop_video
+        loop_video: data.loop_video,
+        output_type: data.output_type
       });
 
       setIsProcessing(true);
@@ -652,6 +659,53 @@ export default function Home() {
                 </div>
               </div>
 
+              {/* Output Type Selection */}
+              <div className="space-y-2">
+                <label className="block text-sm font-medium mb-1">
+                  Output Type
+                </label>
+                <div className="grid grid-cols-3 gap-2">
+                  <button
+                    type="button"
+                    className={`p-2 rounded-md text-center text-sm ${
+                      outputType === "audio"
+                        ? "bg-purple-600 text-white"
+                        : "bg-zinc-800 text-zinc-300 hover:bg-zinc-700"
+                    }`}
+                    onClick={() => setOutputType("audio")}
+                  >
+                    Audio Only
+                  </button>
+                  <button
+                    type="button"
+                    className={`p-2 rounded-md text-center text-sm ${
+                      outputType === "video"
+                        ? "bg-purple-600 text-white"
+                        : "bg-zinc-800 text-zinc-300 hover:bg-zinc-700"
+                    }`}
+                    onClick={() => setOutputType("video")}
+                  >
+                    Trimmed Video
+                  </button>
+                  <button
+                    type="button"
+                    className={`p-2 rounded-md text-center text-sm ${
+                      outputType === "full_video"
+                        ? "bg-purple-600 text-white"
+                        : "bg-zinc-800 text-zinc-300 hover:bg-zinc-700"
+                    }`}
+                    onClick={() => setOutputType("full_video")}
+                  >
+                    Full Video
+                  </button>
+                </div>
+                <p className="text-xs text-gray-500 mt-1">
+                  {outputType === "audio" && "Process and download audio only with reverb effects applied."}
+                  {outputType === "video" && "Process audio with reverb effects and combine with trimmed video."}
+                  {outputType === "full_video" && "Process audio with reverb effects and combine with the full original video."}
+                </p>
+              </div>
+
               <div className="flex flex-col gap-4">
                 <Button
                   type="button"
@@ -659,7 +713,7 @@ export default function Home() {
                   disabled={isProcessing || isPreviewing}
                   className="w-full flex items-center justify-center gap-2 bg-fuchsia-600 hover:bg-fuchsia-700 text-black dark:text-zinc-900 font-mono tracking-wide uppercase text-sm"
                 >
-                  {isPreviewing ? "Generating Preview..." : "Preview (15-35s)"}
+                  {isPreviewing ? "Generating Preview..." : "Preview Audio (15-35s)"}
                 </Button>
 
                 <Button
@@ -675,7 +729,11 @@ export default function Home() {
                 ) : (
                   <>
                     <Download className="h-4 w-4" />
-                    <span>Process & Download</span>
+                    <span>
+                      {outputType === "audio" && "Download Audio"}
+                      {outputType === "video" && "Download Trimmed Video"}
+                      {outputType === "full_video" && "Download Full Video"}
+                    </span>
                   </>
                 )}
                 </Button>
